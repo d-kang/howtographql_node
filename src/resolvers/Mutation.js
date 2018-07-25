@@ -5,18 +5,16 @@ const { getUserId, APP_SECRET } = require('../utils')
 module.exports = {
   post(root, args, context, info) {
     const userId = getUserId(context)
-    const m = {
-      data: {
-        url: args.url,
-        description: args.description,
-        postedBy: { connect: {id: userId } },
-      },
+    const data = {
+      url: args.url,
+      description: args.description,
+      postedBy: { connect: {id: userId } },
     }
 
     return context
       .db
       .mutation
-      .createLink(m, info)
+      .createLink({ data }, info)
   },
 
   async signup(root, args, context, info) {
@@ -24,11 +22,11 @@ module.exports = {
       .hash(args.password, 10)
 
 
-    const m = { data: { ...args, password } }
+    const data = { data: { ...args, password } }
     const user = await context
       .db
       .mutation
-      .createUser(m, `{ id }`)
+      .createUser({ data }, `{ id }`)
 
     const Token = jwt
       .sign({ userId: user.id }, APP_SECRET)
@@ -37,11 +35,11 @@ module.exports = {
   },
 
   async login(root, args, context, info) {
-    const q = { where: { email: args.email } }
+    const where = { email: args.email }
     const user = await context
       .db
       .query
-      .user(q, `{ id password }`)
+      .user({ where }, `{ id password }`)
 
     if (!user) {
       throw new Error('No such user found')
@@ -79,17 +77,15 @@ module.exports = {
       throw new Error(`Already voted for link ${args.linkId}`)
     }
 
-    const m = {
-      data: {
-        user: { connect: { id: userId } },
-        link: { connect: { id: args.linkId } },
-      },
+    const data = {
+      user: { connect: { id: userId } },
+      link: { connect: { id: args.linkId } },
     }
 
     return context
       .db
       .mutation
-      .createVote(m, info)
+      .createVote({ data }, info)
   }
 }
 

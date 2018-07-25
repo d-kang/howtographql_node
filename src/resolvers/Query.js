@@ -1,10 +1,8 @@
 module.exports = {
   feed(root, args, context, info) {
-    console.log('args.linkId: ', args.linkId);
-    if (args.linkId) {
-
-      const ql = { where: { id: args.linkId } }
-      return context.db.query.links(ql, info)
+    if (args.filter) {
+      const where = { OR: [{ url_contains: args.filter }, { description_contains: args.filter } ] }
+      return context.db.query.links({ where }, info)
     }
     return context.db.query.links({}, info)
   }
