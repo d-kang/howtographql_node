@@ -11,7 +11,7 @@
   },
   "scripts": {
     "start": "nodemon src/index.js",
-    "prisma": "prisma deploy",
+    "deploy": "prisma deploy",
     "playground": "graphql playground",
     "test": "jest --watchAll"
   },

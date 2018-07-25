@@ -8,6 +8,15 @@ module.exports = {
         .subscription
         .link(m, info)
     }
-  }
+  },
+  newVote: {
+    subscribe(root, args, context, info) {
+      const ql = { where: { mutation_in: ['CREATED'] } }
+      return context
+        .db
+        .subscription
+        .vote(ql, info)
+    }
+  },
 }
 

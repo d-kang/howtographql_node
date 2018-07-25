@@ -62,6 +62,35 @@ module.exports = {
     return { Token, user }
   },
 
+  async vote(root, args, context, info) {
+    const userId = getUserId(context)
+
+    const q = {
+      user: { id: userId },
+      link: { id: args.linkId },
+    }
+
+    const linkExists = await context
+      .db
+      .exists
+      .Vote(q)
+
+    if (linkExists) {
+      throw new Error(`Already voted for link ${args.linkId}`)
+    }
+
+    const m = {
+      data: {
+        user: { connect: { id: userId } },
+        link: { connect: { id: args.linkId } },
+      },
+    }
+
+    return context
+      .db
+      .mutation
+      .createVote(m, info)
+  }
 }
 
 
