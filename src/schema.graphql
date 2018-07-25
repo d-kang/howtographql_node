@@ -1,4 +1,4 @@
-# import Link from "./generated/prisma.graphql';
+# import Link, LinkSubscriptionPayload from "./generated/prisma.graphql"
 
 type Query {
   info: String!
@@ -22,6 +22,11 @@ type User {
   name: String!
   links: [Link!]!
 }
+
+type Subscription {
+  newLink: LinkSubscriptionPayload
+}
+
 
 
 # link removed because we will import it

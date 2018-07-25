@@ -3,6 +3,7 @@ const { Prisma } = require('prisma-binding')
 const Query = require('./resolvers/Query')
 const Mutation = require('./resolvers/Mutation')
 const AuthPayload = require('./resolvers/AuthPayload')
+const Subscription = require('./resolvers/Subscription.js')
 
 const server = new GraphQLServer({
   typeDefs: './src/schema.graphql',
@@ -10,6 +11,7 @@ const server = new GraphQLServer({
     Query,
     Mutation,
     AuthPayload,
+    Subscription,
   },
   context(req) {
     return {
@@ -24,8 +26,8 @@ const server = new GraphQLServer({
   },
 
 })
-
-server.start(() => console.log(`Server is running on http://localhost:4000`))
+const PORT = server.options.port = process.env.PORT || 2000
+server.start(() => console.log(`Server is running on http://localhost:${PORT}`))
 
 /* resolvers */
 /**
