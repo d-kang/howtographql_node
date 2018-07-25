@@ -3,11 +3,11 @@ const jwt = require('jsonwebtoken')
 const { getUserId, APP_SECRET } = require('../utils')
 
 module.exports = {
-  post(root, args, context, info) {
+  post(root, { url, description }, context, info) {
     const userId = getUserId(context)
     const data = {
-      url: args.url,
-      description: args.description,
+      url,
+      description,
       postedBy: { connect: {id: userId } },
     }
 
@@ -16,13 +16,12 @@ module.exports = {
       .mutation
       .createLink({ data }, info)
   },
+  async signup(root, { name, email, password, }, context, info) {
+    const hashedPassword = await bcrypt
+      .hash(password, 10)
 
-  async signup(root, args, context, info) {
-    const password = await bcrypt
-      .hash(args.password, 10)
 
-
-    const data = { data: { ...args, password } }
+    const data = { data: { name, email, password: hashedPassword } }
     const user = await context
       .db
       .mutation
@@ -34,8 +33,8 @@ module.exports = {
     return { Token, user }
   },
 
-  async login(root, args, context, info) {
-    const where = { email: args.email }
+  async login(root, { email, password }, context, info) {
+    const where = { email }
     const user = await context
       .db
       .query
@@ -45,10 +44,8 @@ module.exports = {
       throw new Error('No such user found')
     }
 
-    const something = bcrypt
-      .compare(args.password, user.password)
-
-    const valid = await something
+    const valid = await bcrypt
+      .compare(password, user.password)
 
     if (!valid) {
       throw new Error('Invalid Password!')
@@ -60,12 +57,12 @@ module.exports = {
     return { Token, user }
   },
 
-  async vote(root, args, context, info) {
+  async vote(root, { linkId }, context, info) {
     const userId = getUserId(context)
 
     const q = {
       user: { id: userId },
-      link: { id: args.linkId },
+      link: { id: linkId },
     }
 
     const linkExists = await context
@@ -74,12 +71,12 @@ module.exports = {
       .Vote(q)
 
     if (linkExists) {
-      throw new Error(`Already voted for link ${args.linkId}`)
+      throw new Error(`Already voted for link ${linkId}`)
     }
 
     const data = {
       user: { connect: { id: userId } },
-      link: { connect: { id: args.linkId } },
+      link: { connect: { id: linkId } },
     }
 
     return context
