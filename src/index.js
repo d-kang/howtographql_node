@@ -4,7 +4,7 @@ const Query = require('./resolvers/Query')
 const Mutation = require('./resolvers/Mutation')
 const AuthPayload = require('./resolvers/AuthPayload')
 const Subscription = require('./resolvers/Subscription.js')
-
+const Feed = require('./resolvers/Feed')
 const server = new GraphQLServer({
   typeDefs: './src/schema.graphql',
   resolvers: {
@@ -12,6 +12,7 @@ const server = new GraphQLServer({
     Mutation,
     AuthPayload,
     Subscription,
+    Feed,
   },
   context(req) {
     return {
