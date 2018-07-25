@@ -1,11 +1,10 @@
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const getUserId = require('../utils')
+const { getUserId, APP_SECRET } = require('../utils')
 
 module.exports = {
   post(root, args, context, info) {
     const userId = getUserId(context)
-
     const m = {
       data: {
         url: args.url,
@@ -13,15 +12,6 @@ module.exports = {
         postedBy: { connect: {id: userId } },
       },
     }
-    // const promis = context
-    //   .db
-    //   .mutation
-    //   .createLink({ data: { ...args } }, info)
-
-    // console.log('promis: ', promis);
-    // return promis
-
-
 
     return context
       .db
@@ -33,16 +23,17 @@ module.exports = {
     const password = await bcrypt
       .hash(args.password, 10)
 
+
     const m = { data: { ...args, password } }
     const user = await context
       .db
       .mutation
       .createUser(m, `{ id }`)
 
-    const token = jwt
+    const Token = jwt
       .sign({ userId: user.id }, APP_SECRET)
 
-    return { token, user }
+    return { Token, user }
   },
 
   async login(root, args, context, info) {
@@ -56,17 +47,19 @@ module.exports = {
       throw new Error('No such user found')
     }
 
-    const valid = await bcrypt
+    const something = bcrypt
       .compare(args.password, user.password)
 
+    const valid = await something
+
     if (!valid) {
-      throw new Error('Invalid Password')
+      throw new Error('Invalid Password!')
     }
 
-    const token = jwt
+    const Token = jwt
       .sign({ userId: user.id }, APP_SECRET)
 
-    return { token, user }
+    return { Token, user }
   },
 
 }

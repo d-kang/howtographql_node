@@ -10,7 +10,8 @@ module.exports = {
       .get('Authorization')
 
     if (Auth) {
-      const token = Auth.replace('Bearer', '')
+      const token = Auth.replace('Bearer ', '')
+
       const { userId } = jwt
         .verify(token, APP_SECRET)
 
